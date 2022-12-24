@@ -18,7 +18,7 @@ Also set-up preferably repeating command block, running following command in ord
 
 ### 2. Joining bot to your Discord channel
 ```
-/theater join <Discord TAG>
+/theater join <Discord username (Name#1234)>
 ```
 
 ### 3. Loading video source
