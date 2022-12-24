@@ -10,8 +10,8 @@ public class Set {
 
     public Set() {
         for (int i = 0; i < 64; ++i) {
-            String binnary = Integer.toBinaryString(i);
-            String[] s = ("0".repeat(6 - binnary.length()) + binnary).split("");
+            String binary = Integer.toBinaryString(i);
+            String[] s = ("0".repeat(6 - binary.length()) + binary).split("");
 
             BlockState state = Blocks.CHISELED_BOOKSHELF.getDefaultState();
 
