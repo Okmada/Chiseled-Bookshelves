@@ -46,3 +46,8 @@ You can make as many displays as you want
 ```
 /theater display <x> <y> <z>
 ```
+
+### 5.Playing video
+```
+/theater play
+```
