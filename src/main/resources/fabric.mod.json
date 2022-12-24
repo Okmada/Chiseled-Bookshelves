@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "theater",
+  "version": "${version}",
+
+  "name": "Theater",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "sources": "https://github.com/Okmada"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/theater/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.adam.theater.Main"
+    ]
+  },
+  "mixins": [
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.10",
+    "fabric-api": "*",
+    "minecraft": "~1.19",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
