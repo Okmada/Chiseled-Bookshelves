@@ -42,51 +42,43 @@ public class Commands {
 
     public void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("theater")
-                .then(CommandManager.literal("render")
-                        .executes(ctx -> {
-//                            long startTime = System.nanoTime();
-                            for (Display d : dp) {
-                                d.update(ctx.getSource());
-                            }
-//                            System.out.printf("Rendering time: %d ms%n", ((System.nanoTime() - startTime)/1000000));
+                .then(CommandManager.literal("discord")
+                        .then(CommandManager.literal("login")
+                                .then(CommandManager.argument("Discord bot token", greedyString())
+                                        .executes(ctx -> {
+                                            String token = getString(ctx, "Discord bot token");
 
-                            return 1;
-                        })
-                )
+                                            bot = JDABuilder.createDefault(token).build();
 
-                .then(CommandManager.literal("login")
-                        .then(CommandManager.argument("Discord bot token", greedyString())
-                                .executes(ctx -> {
-                                    String token = getString(ctx, "Discord bot token");
-
-                                    bot = JDABuilder.createDefault(token).build();
-
-                                    ctx.getSource().sendMessage(Text.literal("Logged in successfully"));
-                                    return 1;
-                                })
+                                            ctx.getSource().sendMessage(Text.literal("Logged in successfully"));
+                                            return 1;
+                                        })
+                                )
                         )
-                )
 
-                .then(CommandManager.literal("join")
-                        .then(CommandManager.argument("Discord TAG", greedyString())
-                                .executes(ctx -> {
-                                    String[] name = getString(ctx, "Discord TAG").split("#");
+                        .then(CommandManager.literal("join")
+                                .then(CommandManager.argument("Discord TAG", greedyString())
+                                        .executes(ctx -> {
+                                            String[] name = getString(ctx, "Discord TAG").split("#");
 
-                                    for (Guild guild : bot.getGuilds()) {
-                                        Member member = guild.getMemberByTag(name[0], name[1]);
-                                        for (VoiceChannel voiceChannel : guild.getVoiceChannels()) {
-                                            if (voiceChannel.getMembers().contains(member)) {
-                                                guild.getAudioManager().openAudioConnection(voiceChannel);
-                                                guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(player));
+                                            if (bot == null) { return 0; }
 
-                                                ctx.getSource().sendMessage(Text.literal("Joined user"));
-                                                return 1;
+                                            for (Guild guild : bot.getGuilds()) {
+                                                Member member = guild.getMemberByTag(name[0], name[1]);
+                                                for (VoiceChannel voiceChannel : guild.getVoiceChannels()) {
+                                                    if (voiceChannel.getMembers().contains(member)) {
+                                                        guild.getAudioManager().openAudioConnection(voiceChannel);
+                                                        guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(player));
+
+                                                        ctx.getSource().sendMessage(Text.literal("Joined user"));
+                                                        return 1;
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
-                                    ctx.getSource().sendMessage(Text.literal("Could not find user"));
-                                    return 1;
-                                })
+                                            ctx.getSource().sendMessage(Text.literal("Could not find user"));
+                                            return 1;
+                                        })
+                                )
                         )
                 )
 
@@ -99,7 +91,6 @@ public class Commands {
                                     String path = getString(ctx, "path to video");
 
                                     player.setPaused(true);
-                                    audio.setLoaded(false);
 
                                     playerManager.loadItem(path, audioLoadResultHandler);
 
@@ -110,14 +101,17 @@ public class Commands {
                                     this.videoStream = new VideoStream(path, 2, 3, scale);
                                     this.videoStream.finishLoading();
 
-                                    dp.clear();
+                                    for (Display d : dp) {
+                                        d.changeVideoStream(videoStream);
+                                    }
 
                                     return 1;
                                 })
                         ))
                 )
 
-                .then(CommandManager.literal("linScreenRec")
+                .then(CommandManager.literal("screenRec")
+                        .then(CommandManager.literal("linux")
                         .then(CommandManager.argument("scale", string())
                         .then(CommandManager.argument("x", string())
                         .then(CommandManager.argument("y", string())
@@ -133,7 +127,6 @@ public class Commands {
 
 
                                     player.setPaused(true);
-                                    audio.setLoaded(true);
 
                                     if (videoStream != null) {
                                         videoStream.exit();
@@ -143,14 +136,16 @@ public class Commands {
                                     this.videoStream.linScreenRec(dx, dy);
                                     this.videoStream.finishLoading();
 
-                                    dp.clear();
+                                    for (Display d : dp) {
+                                        d.changeVideoStream(this.videoStream);
+                                    }
 
+                                    player.stopTrack();
                                     return 1;
                                 })
-                        )))))
-                )
+                        ))))))
 
-                .then(CommandManager.literal("winScreenRec")
+                        .then(CommandManager.literal("windows")
                         .then(CommandManager.argument("scale", string())
                         .then(CommandManager.argument("window", greedyString())
                                 .executes(ctx -> {
@@ -159,7 +154,6 @@ public class Commands {
                                     String window = getString(ctx, "window");
 
                                     player.setPaused(true);
-                                    audio.setLoaded(true);
 
                                     if (videoStream != null) {
                                         videoStream.exit();
@@ -169,20 +163,17 @@ public class Commands {
                                     this.videoStream.winScreenRec();
                                     this.videoStream.finishLoading();
 
-                                    dp.clear();
-
+                                    for (Display d : dp) {
+                                        d.changeVideoStream(videoStream);
+                                    }
+                                    player.stopTrack();
                                     return 1;
                                 })
-                        ))
+                        )))
                 )
 
                 .then(CommandManager.literal("play")
                         .executes(ctx -> {
-                            if (!audio.isLoaded()) {
-                                ctx.getSource().sendMessage(Text.literal("Audio is not loaded yet"));
-                                return 1;
-                            }
-
                             player.setPaused(false);
 
                             this.videoStream.start();
@@ -192,26 +183,49 @@ public class Commands {
                 )
 
                 .then(CommandManager.literal("display")
+                        .then(CommandManager.literal("add")
                         .then(CommandManager.argument("xPos", string())
                         .then(CommandManager.argument("yPos", string())
                         .then(CommandManager.argument("zPos", string())
                                 .executes(ctx -> {
-                                    if (this.videoStream == null) {
-                                        ctx.getSource().sendMessage(Text.literal("Not loaded"));
-                                        return 1;
-                                    }
-
                                     double x = Double.parseDouble(getString(ctx, "xPos"));
                                     double y = Double.parseDouble(getString(ctx, "yPos"));
                                     double z = Double.parseDouble(getString(ctx, "zPos"));
 
                                     BlockPos bp = new BlockPos(x, y, z);
 
-                                    dp.add(new Display(this.videoStream, bp, set, ctx.getSource()));
+                                    Display display = new Display(ctx.getSource().getWorld(), bp, set);
+
+                                    dp.add(display);
+
+                                    if (this.videoStream != null) {
+                                        display.changeVideoStream(this.videoStream);
+                                    }
 
                                     return 1;
                                 })
-                        )))
+                        ))))
+
+                        .then(CommandManager.literal("clean")
+                                .executes(ctx -> {
+                                    for (Display d : dp) {
+                                        d.removeCanvas();
+                                    }
+                                    dp.clear();
+                                    return 1;
+                                })
+                        )
+
+                        .then(CommandManager.literal("render")
+                                .executes(ctx -> {
+//                                    long startTime = System.nanoTime();
+                                    for (Display d : dp) {
+                                        d.update();
+                                    }
+//                                    System.out.printf("Rendering time: %d ms%n", ((System.nanoTime() - startTime)/1000000));
+                                    return 1;
+                                })
+                        )
                 )
         );
     }

@@ -18,7 +18,6 @@ public class Audio {
         @Override
         public void trackLoaded(AudioTrack track) {
             player.playTrack(track);
-            setLoaded(true);
         }
 
         @Override
@@ -37,7 +36,7 @@ public class Audio {
     public Audio() {
         AudioSourceManagers.registerLocalSource(playerManager);
 
-//        player.addListene\\r(trackScheduler);
+//        player.addListener(trackScheduler);
     }
 
     public AudioPlayer getPlayer() {
@@ -54,16 +53,5 @@ public class Audio {
 
     public AudioLoadResultHandler getLoadResultHandler() {
         return loadResultHandler;
-    }
-
-
-    private boolean isLoaded = false;
-
-    public boolean isLoaded() {
-        return isLoaded;
-    }
-
-    public void setLoaded(boolean loaded) {
-        isLoaded = loaded;
     }
 }

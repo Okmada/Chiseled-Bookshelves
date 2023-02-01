@@ -3,25 +3,35 @@
 ## How to run
 Execute commands in this order
 
-If you want to load another video, continue from step 2 (Joining bot to your Discord channel), DO NOT RUN INIT AGAIN
+If you want to load another video, continue from step 4 (Loading video source), DO NOT RUN INIT AGAIN
 ### 1. Init
 ```
-/theater login <Discord bot token>
+/theater discord login <Discord bot token>
 ```
 
 After getting "Logged in successfully" you can proceed with next steps
 
 Also set-up preferably repeating command block, running following command in order to keep displays content updated 
 ```
-/theater render
+/theater display render
 ```
 
 ### 2. Joining bot to your Discord channel
 ```
-/theater join <Discord username (Name#1234)>
+/theater discord join <Discord username (Name#1234)>
 ```
 
-### 3. Loading video source
+### 3. Displays
+You can make as many displays as you want
+```
+/theater display add <x> <y> <z>
+```
+To clear all displays run
+```
+/theater display clear
+```
+
+### 4. Loading video source
 Run one of the following commands, depending on what you want to do
 
 
@@ -33,18 +43,12 @@ Run one of the following commands, depending on what you want to do
 
 Linux: (use coordinates on screen, not in mc)
 ```
-/theater linScreenRec <scale coefficient> <x> <y> <dx> <dy>
+/theater screenRec linux <scale coefficient> <x> <y> <dx> <dy>
 ```
 
 Windows:
 ```
-/theater winScreenRec <scale coefficient> desktop
-```
-
-### 4. Displays
-You can make as many displays as you want
-```
-/theater display <x> <y> <z>
+/theater screenRec windows <scale coefficient> desktop
 ```
 
 ### 5.Playing video

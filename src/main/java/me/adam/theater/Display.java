@@ -2,38 +2,61 @@ package me.adam.theater;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class Display {
 
-    private final VideoStream videoStream;
+    private VideoStream videoStream;
 
-    private final Integer Width;
-    private final Integer Height;
+    private Integer Width;
+    private Integer Height;
 
     private final Set dataset;
 
-    private final BlockPos dbp;
+    private final BlockPos bp;
 
-    public Display(VideoStream videoStream, BlockPos bp, Set set, ServerCommandSource source) {
+    private final World world;
+
+    public Display(World world, BlockPos bp, Set set) {
+        dataset = set;
+        this.bp = bp;
+        this.world = world;
+    }
+    public void changeVideoStream(VideoStream videoStream) {
+        removeCanvas();
+
         this.videoStream = videoStream;
 
-        Width = videoStream.getWidth()/3;
-        Height = videoStream.getHeight()/2;
+        if (this.videoStream == null) { return; }
 
-        dataset = set;
+        Width = this.videoStream.getWidth()/3;
+        Height = this.videoStream.getHeight()/2;
 
-        dbp = bp;
+        placeCanvas();
+    }
 
-        for(int dx = 0; dx < Width; ++dx) {
+    public void removeCanvas() {
+            if (this.videoStream == null) {return;}
+
+            for(int dx = 0; dx < Width; ++dx) {
             for (int dy = 0; dy < Height; ++dy) {
-                source.getWorld().setBlockState(bp.add(dx, dy, 0), Blocks.CHISELED_BOOKSHELF.getDefaultState());
+                world.setBlockState(bp.add(dx, dy, 0), Blocks.AIR.getDefaultState());
             }
         }
     }
 
-    public void update(ServerCommandSource ctx) {
+    public void placeCanvas() {
+        if (this.videoStream == null) {return;}
+
+        for(int dx = 0; dx < Width; ++dx) {
+            for (int dy = 0; dy < Height; ++dy) {
+                world.setBlockState(bp.add(dx, dy, 0), Blocks.CHISELED_BOOKSHELF.getDefaultState());
+            }
+        }
+    }
+
+    public void update() {
         for(int dx = 0; dx < Width; ++dx) {
             for (int dy = 0; dy < Height; ++dy) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -47,9 +70,9 @@ public class Display {
                     }
                 }
                 BlockState state = dataset.blockStateArray[Integer.parseInt(stringBuilder.toString(), 2)];
-                BlockPos pos = dbp.add(dx, dy, 0);
+                BlockPos pos = bp.add(dx, dy, 0);
 
-                ctx.getWorld().setBlockState(pos, state);
+                world.setBlockState(pos, state);
             }
         }
     }
