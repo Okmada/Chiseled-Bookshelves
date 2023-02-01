@@ -35,7 +35,7 @@ dependencies {
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 	implementation include(group: 'org.bytedeco', name: 'javacv-platform', version: '1.5.8')
-	implementation include("net.dv8tion:JDA:5.0.0-alpha.22")
+	implementation("net.dv8tion:JDA:5.0.0-beta.2")
 	implementation include('com.sedmelluq:lavaplayer:1.3.76')
 
 	implementation 'org.apache.httpcomponents:httpclient:4.5.14'
