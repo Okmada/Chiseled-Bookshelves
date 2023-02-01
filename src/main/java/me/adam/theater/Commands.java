@@ -82,104 +82,106 @@ public class Commands {
                         )
                 )
 
-                .then(CommandManager.literal("load")
-                        .then(CommandManager.argument("scale", string())
-                        .then(CommandManager.argument("path to video", greedyString())
+                .then(CommandManager.literal("video")
+                        .then(CommandManager.literal("load")
+                                .then(CommandManager.argument("scale", string())
+                                .then(CommandManager.argument("path to video", greedyString())
+                                        .executes(ctx -> {
+                                            double scale = Double.parseDouble(getString(ctx, "scale"));
+
+                                            String path = getString(ctx, "path to video");
+
+                                            player.setPaused(true);
+
+                                            playerManager.loadItem(path, audioLoadResultHandler);
+
+                                            if (videoStream != null) {
+                                                videoStream.exit();
+                                            }
+
+                                            this.videoStream = new VideoStream(path, 2, 3, scale);
+                                            this.videoStream.finishLoading();
+
+                                            for (Display d : dp) {
+                                                d.changeVideoStream(videoStream);
+                                            }
+
+                                            return 1;
+                                        })
+                                ))
+                        )
+
+                        .then(CommandManager.literal("screenRec")
+                                .then(CommandManager.literal("linux")
+                                .then(CommandManager.argument("scale", string())
+                                .then(CommandManager.argument("x", string())
+                                .then(CommandManager.argument("y", string())
+                                .then(CommandManager.argument("dx", string())
+                                .then(CommandManager.argument("dy", string())
+                                        .executes(ctx -> {
+                                            double scale = Double.parseDouble(getString(ctx, "scale"));
+
+                                            int x = Integer.parseInt(getString(ctx, "x"));
+                                            int y = Integer.parseInt(getString(ctx, "y"));
+                                            int dx = Integer.parseInt(getString(ctx, "dx"));
+                                            int dy = Integer.parseInt(getString(ctx, "dy"));
+
+
+                                            player.setPaused(true);
+
+                                            if (videoStream != null) {
+                                                videoStream.exit();
+                                            }
+
+                                            this.videoStream = new VideoStream(":0.0+" + x + "," + y, 2, 3, scale);
+                                            this.videoStream.linScreenRec(dx, dy);
+                                            this.videoStream.finishLoading();
+
+                                            for (Display d : dp) {
+                                                d.changeVideoStream(this.videoStream);
+                                            }
+
+                                            player.stopTrack();
+                                            return 1;
+                                        })
+                                ))))))
+
+                                .then(CommandManager.literal("windows")
+                                .then(CommandManager.argument("scale", string())
+                                .then(CommandManager.argument("window", greedyString())
+                                        .executes(ctx -> {
+                                            double scale = Double.parseDouble(getString(ctx, "scale"));
+
+                                            String window = getString(ctx, "window");
+
+                                            player.setPaused(true);
+
+                                            if (videoStream != null) {
+                                                videoStream.exit();
+                                            }
+
+                                            this.videoStream = new VideoStream(window, 2, 3, scale);
+                                            this.videoStream.winScreenRec();
+                                            this.videoStream.finishLoading();
+
+                                            for (Display d : dp) {
+                                                d.changeVideoStream(videoStream);
+                                            }
+                                            player.stopTrack();
+                                            return 1;
+                                        })
+                                )))
+                        )
+
+                        .then(CommandManager.literal("play")
                                 .executes(ctx -> {
-                                    double scale = Double.parseDouble(getString(ctx, "scale"));
+                                    player.setPaused(false);
 
-                                    String path = getString(ctx, "path to video");
-
-                                    player.setPaused(true);
-
-                                    playerManager.loadItem(path, audioLoadResultHandler);
-
-                                    if (videoStream != null) {
-                                        videoStream.exit();
-                                    }
-
-                                    this.videoStream = new VideoStream(path, 2, 3, scale);
-                                    this.videoStream.finishLoading();
-
-                                    for (Display d : dp) {
-                                        d.changeVideoStream(videoStream);
-                                    }
+                                    this.videoStream.start();
 
                                     return 1;
                                 })
-                        ))
-                )
-
-                .then(CommandManager.literal("screenRec")
-                        .then(CommandManager.literal("linux")
-                        .then(CommandManager.argument("scale", string())
-                        .then(CommandManager.argument("x", string())
-                        .then(CommandManager.argument("y", string())
-                        .then(CommandManager.argument("dx", string())
-                        .then(CommandManager.argument("dy", string())
-                                .executes(ctx -> {
-                                    double scale = Double.parseDouble(getString(ctx, "scale"));
-
-                                    int x = Integer.parseInt(getString(ctx, "x"));
-                                    int y = Integer.parseInt(getString(ctx, "y"));
-                                    int dx = Integer.parseInt(getString(ctx, "dx"));
-                                    int dy = Integer.parseInt(getString(ctx, "dy"));
-
-
-                                    player.setPaused(true);
-
-                                    if (videoStream != null) {
-                                        videoStream.exit();
-                                    }
-
-                                    this.videoStream = new VideoStream(":0.0+" + x + "," + y, 2, 3, scale);
-                                    this.videoStream.linScreenRec(dx, dy);
-                                    this.videoStream.finishLoading();
-
-                                    for (Display d : dp) {
-                                        d.changeVideoStream(this.videoStream);
-                                    }
-
-                                    player.stopTrack();
-                                    return 1;
-                                })
-                        ))))))
-
-                        .then(CommandManager.literal("windows")
-                        .then(CommandManager.argument("scale", string())
-                        .then(CommandManager.argument("window", greedyString())
-                                .executes(ctx -> {
-                                    double scale = Double.parseDouble(getString(ctx, "scale"));
-
-                                    String window = getString(ctx, "window");
-
-                                    player.setPaused(true);
-
-                                    if (videoStream != null) {
-                                        videoStream.exit();
-                                    }
-
-                                    this.videoStream = new VideoStream(window, 2, 3, scale);
-                                    this.videoStream.winScreenRec();
-                                    this.videoStream.finishLoading();
-
-                                    for (Display d : dp) {
-                                        d.changeVideoStream(videoStream);
-                                    }
-                                    player.stopTrack();
-                                    return 1;
-                                })
-                        )))
-                )
-
-                .then(CommandManager.literal("play")
-                        .executes(ctx -> {
-                            player.setPaused(false);
-
-                            this.videoStream.start();
-
-                            return 1;
-                        })
+                        )
                 )
 
                 .then(CommandManager.literal("display")

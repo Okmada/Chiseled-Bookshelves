@@ -37,21 +37,21 @@ Run one of the following commands, depending on what you want to do
 
 **If you want to play video** 
 ```
-/theater load <scale coefficient> <path to video>
+/theater video load <scale coefficient> <path to video>
 ```
 **If you want screen share** 
 
 Linux: (use coordinates on screen, not in mc)
 ```
-/theater screenRec linux <scale coefficient> <x> <y> <dx> <dy>
+/theater video screenRec linux <scale coefficient> <x> <y> <dx> <dy>
 ```
 
 Windows:
 ```
-/theater screenRec windows <scale coefficient> desktop
+/theater video screenRec windows <scale coefficient> desktop
 ```
 
 ### 5.Playing video
 ```
-/theater play
+/theater video play
 ```
