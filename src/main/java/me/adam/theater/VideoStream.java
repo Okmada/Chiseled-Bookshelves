@@ -55,11 +55,10 @@ public class VideoStream extends Thread{
         this.width = (Math.floorDiv((int)(frameGrabber.getImageWidth() * scale), round_to_w) * round_to_w);
         this.height = (Math.floorDiv((int)(frameGrabber.getImageHeight() * scale), round_to_h) * round_to_h);
 
-        System.out.println(this.frameGrabber.getImageWidth());
-        System.out.println(this.frameGrabber.getImageHeight());
-        System.out.println(width);
-        System.out.println(height);
-
+        System.out.printf("Input video dims %d x %d \nOutput video dims %d x %d\n",
+                this.frameGrabber.getImageWidth(), this.frameGrabber.getImageHeight(),
+                width, height
+        );
 
         this.display = new int[width][height][3];
     }
