@@ -37,9 +37,9 @@ public class Display {
     }
 
     public void removeCanvas() {
-            if (this.videoStream == null) {return;}
+        if (this.videoStream == null) { return; }
 
-            for(int dx = 0; dx < Width; ++dx) {
+        for(int dx = 0; dx < Width; ++dx) {
             for (int dy = 0; dy < Height; ++dy) {
                 world.setBlockState(bp.add(dx, dy, 0), Blocks.AIR.getDefaultState());
             }
