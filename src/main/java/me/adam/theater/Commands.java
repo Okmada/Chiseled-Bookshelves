@@ -194,17 +194,20 @@ public class Commands {
 
                 .then(CommandManager.literal("display")
                         .then(CommandManager.literal("add")
+                        .then(CommandManager.argument("isRGB", string())
                         .then(CommandManager.argument("xPos", string())
                         .then(CommandManager.argument("yPos", string())
                         .then(CommandManager.argument("zPos", string())
                                 .executes(ctx -> {
+                                    boolean rgb = Boolean.parseBoolean(getString(ctx, "isRGB"));
+
                                     double x = Double.parseDouble(getString(ctx, "xPos"));
                                     double y = Double.parseDouble(getString(ctx, "yPos"));
                                     double z = Double.parseDouble(getString(ctx, "zPos"));
 
                                     BlockPos bp = new BlockPos(x, y, z);
 
-                                    Display display = new Display(ctx.getSource().getWorld(), bp, set);
+                                    Display display = new Display(ctx.getSource().getWorld(), bp, set, rgb);
 
                                     dp.add(display);
 
@@ -214,9 +217,9 @@ public class Commands {
 
                                     return 1;
                                 })
-                        ))))
+                        )))))
 
-                        .then(CommandManager.literal("clean")
+                        .then(CommandManager.literal("clear")
                                 .executes(ctx -> {
                                     for (Display d : dp) {
                                         d.removeCanvas();

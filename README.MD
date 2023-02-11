@@ -24,7 +24,7 @@ Also set-up preferably repeating command block, running following command in ord
 ### 3. Displays
 You can make as many displays as you want
 ```
-/theater display add <x> <y> <z>
+/theater display add <isRGB> <x> <y> <z>
 ```
 To clear all displays run
 ```

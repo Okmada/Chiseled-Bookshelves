@@ -1,6 +1,7 @@
 package me.adam.theater;
 
 import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
@@ -80,24 +81,29 @@ public class VideoStream extends Thread{
 
             while(delta >= 1){
                 try {
-//                    long startTime = System.nanoTime();
-                    BufferedImage img = java2DFrameConverter.convert(frameGrabber.grabImage());
-
-                    if (img == null) { return; }
-
-                    for(int x = 0; x < this.width; ++x) {
-                        for(int y = 0; y < this.height; ++y) {
-                            int color = img.getRGB((int)(x * (1/this.scale)), (int)(y * (1/this.scale)));
-
-                            // blue
-                            this.display[x][y][2] = color & 0xff;
-                            // green
-                            this.display[x][y][1] = (color & 0xff00) >> 8;
-                            // red
-                            this.display[x][y][0] = (color & 0xff0000) >> 16;
-                        }
+                    Frame frame = frameGrabber.grab();
+                    if (frame == null) {
+                        System.out.println("FINISHED");
+                        return;
                     }
-//                    System.out.printf("Frame processing time: %d ms%n", ((System.nanoTime() - startTime)/1000000));
+
+                    BufferedImage img = java2DFrameConverter.convert(frame);
+                    if (img != null) {
+                        for(int x = 0; x < this.width; ++x) {
+                            for(int y = 0; y < this.height; ++y) {
+                                int color = img.getRGB((int)(x * (1/this.scale)), (int)(y * (1/this.scale)));
+
+                                // blue
+                                this.display[x][y][2] = color & 0xff;
+                                // green
+                                this.display[x][y][1] = (color & 0xff00) >> 8;
+                                // red
+                                this.display[x][y][0] = (color & 0xff0000) >> 16;
+                            }
+                        }
+                    } else {
+                        continue;
+                    }
                 } catch (FFmpegFrameGrabber.Exception e) {
                     e.printStackTrace();
                 }
