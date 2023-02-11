@@ -46,6 +46,11 @@ public class Commands {
                         .then(CommandManager.literal("login")
                                 .then(CommandManager.argument("Discord bot token", greedyString())
                                         .executes(ctx -> {
+                                            if (bot != null) {
+                                                ctx.getSource().sendMessage(Text.literal("Bot already logged in"));
+                                                return 0;
+                                            }
+
                                             String token = getString(ctx, "Discord bot token");
 
                                             bot = JDABuilder.createDefault(token).build();
@@ -59,9 +64,12 @@ public class Commands {
                         .then(CommandManager.literal("join")
                                 .then(CommandManager.argument("Discord TAG", greedyString())
                                         .executes(ctx -> {
-                                            String[] name = getString(ctx, "Discord TAG").split("#");
+                                            if (bot == null) {
+                                                ctx.getSource().sendMessage(Text.literal("Bot not logged in"));
+                                                return 0;
+                                            }
 
-                                            if (bot == null) { return 0; }
+                                            String[] name = getString(ctx, "Discord TAG").split("#");
 
                                             for (Guild guild : bot.getGuilds()) {
                                                 Member member = guild.getMemberByTag(name[0], name[1]);
