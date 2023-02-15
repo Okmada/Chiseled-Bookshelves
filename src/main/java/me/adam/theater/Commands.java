@@ -239,6 +239,22 @@ public class Commands {
                                     return 1;
                                 })
                         )
+
+                        .then(CommandManager.literal("setRGB")
+                                .then(CommandManager.argument("index", string())
+                                .then(CommandManager.argument("isRGB", string())
+                                        .executes(ctx -> {
+                                            boolean rgb = Boolean.parseBoolean(getString(ctx, "isRGB"));
+                                            int index = Integer.parseInt(getString(ctx, "index"));
+
+                                            if (index > dp.size()) {
+                                                return 1;
+                                            }
+                                            dp.get(index).setIsRGB(rgb);
+                                            return 1;
+                                        })
+                                ))
+                        )
                 )
         );
     }

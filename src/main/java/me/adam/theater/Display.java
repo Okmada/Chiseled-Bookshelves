@@ -18,7 +18,7 @@ public class Display {
 
     private final World world;
 
-    private final Boolean isRGB;
+    private Boolean isRGB;
 
     public Display(World world, BlockPos bp, Set set, Boolean isRGB) {
         dataset = set;
@@ -58,6 +58,10 @@ public class Display {
                 world.setBlockState(bp.add(dx, dy, 0), Blocks.CHISELED_BOOKSHELF.getDefaultState());
             }
         }
+    }
+
+    public void setIsRGB(Boolean isRGB) {
+        this.isRGB = isRGB;
     }
 
     public void update() {
