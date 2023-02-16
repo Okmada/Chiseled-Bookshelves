@@ -247,10 +247,12 @@ public class Commands {
                                             boolean rgb = Boolean.parseBoolean(getString(ctx, "isRGB"));
                                             int index = Integer.parseInt(getString(ctx, "index"));
 
-                                            if (index > dp.size()) {
+                                            if (index >= dp.size()) {
+                                                ctx.getSource().sendMessage(Text.literal("Index out of bound"));
                                                 return 1;
                                             }
                                             dp.get(index).setIsRGB(rgb);
+                                            ctx.getSource().sendMessage(Text.literal("Mode successfully changed"));
                                             return 1;
                                         })
                                 ))
