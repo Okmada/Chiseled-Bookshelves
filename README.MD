@@ -1,4 +1,5 @@
 # Project bookshelves
+If you are publishing this mod or clip of this mod, please attach link to this repo somewhere.
 
 ## How to run
 Execute commands in this order
