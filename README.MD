@@ -3,7 +3,7 @@
 ## How to run
 Execute commands in this order
 
-If you want to load another video, continue from step 4 (Loading video source), DO NOT RUN INIT AGAIN
+If you want to load another video, continue from step 4 (Loading video source)
 ### 1. Init
 ```
 /theater discord login <Discord bot token>
