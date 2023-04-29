@@ -104,8 +104,6 @@ public class VideoStream extends Thread {
         lastTime = System.nanoTime();
         final double ns = 1000000000.0 / frameGrabber.getFrameRate();
         double delta = 0;
-        System.out.println(frameGrabber.getFrameRate());
-        System.out.println(ns);
 
         while (running.get()) {
             long now = System.nanoTime();
@@ -122,6 +120,11 @@ public class VideoStream extends Thread {
                         return;
                     }
 
+                    BufferedImage img = java2DFrameConverter.convert(frame);
+                    if (img != null) {
+                        imageQueue.add(img);
+                    }
+
                     if (frame.samples != null) {
                         ShortBuffer shortBuffer = (ShortBuffer) frame.samples[0];
                         while (shortBuffer.hasRemaining()) shortQueue.add(shortBuffer.get());
@@ -133,11 +136,6 @@ public class VideoStream extends Thread {
 
                             handler.appendBuffer(b.flip());
                         }
-                    }
-
-                    BufferedImage img = java2DFrameConverter.convert(frame);
-                    if (img != null) {
-                        imageQueue.add(img);
                     }
                 } catch (FFmpegFrameGrabber.Exception e) {
                     e.printStackTrace();
