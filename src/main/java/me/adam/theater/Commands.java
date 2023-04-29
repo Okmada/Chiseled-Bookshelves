@@ -1,10 +1,6 @@
 package me.adam.theater;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import me.adam.theater.audio.Audio;
 import me.adam.theater.audio.AudioPlayerSendHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -27,18 +23,13 @@ public class Commands {
 
     private JDA bot;
 
-    private final Audio audio = new Audio();
-
-    private final AudioPlayerManager playerManager = audio.getPlayerManager();
-    private final AudioPlayer player = audio.getPlayer();
-    //    private final TrackScheduler trackScheduler = audio.getTrackScheduler();
-    private final AudioLoadResultHandler audioLoadResultHandler = audio.getLoadResultHandler();
-
     private VideoStream videoStream = null;
 
     private final Set set = new Set();
 
     private final List<Display> dp = new ArrayList<>();
+
+    private final AudioPlayerSendHandler handler = new AudioPlayerSendHandler();
 
     public void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("theater")
@@ -76,7 +67,7 @@ public class Commands {
                                                 for (VoiceChannel voiceChannel : guild.getVoiceChannels()) {
                                                     if (voiceChannel.getMembers().contains(member)) {
                                                         guild.getAudioManager().openAudioConnection(voiceChannel);
-                                                        guild.getAudioManager().setSendingHandler(new AudioPlayerSendHandler(player));
+                                                        guild.getAudioManager().setSendingHandler(handler);
 
                                                         ctx.getSource().sendMessage(Text.literal("Joined user"));
                                                         return 1;
@@ -99,15 +90,11 @@ public class Commands {
 
                                             String path = getString(ctx, "path to video");
 
-                                            player.setPaused(true);
-
-                                            playerManager.loadItem(path, audioLoadResultHandler);
-
                                             if (videoStream != null) {
                                                 videoStream.exit();
                                             }
 
-                                            this.videoStream = new VideoStream(path, 2, 3, scale);
+                                            this.videoStream = new VideoStream(path, 2, 3, scale, handler);
                                             this.videoStream.finishLoading();
 
                                             for (Display d : dp) {
@@ -134,14 +121,11 @@ public class Commands {
                                             int dx = Integer.parseInt(getString(ctx, "dx"));
                                             int dy = Integer.parseInt(getString(ctx, "dy"));
 
-
-                                            player.setPaused(true);
-
                                             if (videoStream != null) {
                                                 videoStream.exit();
                                             }
 
-                                            this.videoStream = new VideoStream(":0.0+" + x + "," + y, 2, 3, scale);
+                                            this.videoStream = new VideoStream(":0.0+" + x + "," + y, 2, 3, scale, handler);
                                             this.videoStream.linScreenRec(dx, dy);
                                             this.videoStream.finishLoading();
 
@@ -149,7 +133,6 @@ public class Commands {
                                                 d.changeVideoStream(this.videoStream);
                                             }
 
-                                            player.stopTrack();
                                             return 1;
                                         })
                                 ))))))
@@ -162,20 +145,17 @@ public class Commands {
 
                                             String window = getString(ctx, "window");
 
-                                            player.setPaused(true);
-
                                             if (videoStream != null) {
                                                 videoStream.exit();
                                             }
 
-                                            this.videoStream = new VideoStream(window, 2, 3, scale);
+                                            this.videoStream = new VideoStream(window, 2, 3, scale, handler);
                                             this.videoStream.winScreenRec();
                                             this.videoStream.finishLoading();
 
                                             for (Display d : dp) {
                                                 d.changeVideoStream(videoStream);
                                             }
-                                            player.stopTrack();
                                             return 1;
                                         })
                                 )))
@@ -183,9 +163,23 @@ public class Commands {
 
                         .then(CommandManager.literal("play")
                                 .executes(ctx -> {
-                                    player.setPaused(false);
-
                                     this.videoStream.start();
+
+                                    return 1;
+                                })
+                        )
+
+                        .then(CommandManager.literal("pause")
+                                .executes(ctx -> {
+                                    this.videoStream.pause();
+
+                                    return 1;
+                                })
+                        )
+
+                        .then(CommandManager.literal("stop")
+                                .executes(ctx -> {
+                                    this.videoStream.exit();
 
                                     return 1;
                                 })
