@@ -110,7 +110,7 @@ public class VideoStream extends Thread {
             delta += (now - lastTime) / ns;
             lastTime = now;
 
-            while (paused.get()) {};
+            while (paused.get()) {}
 
             while (imageQueue.size() < 1) {
                 try {
