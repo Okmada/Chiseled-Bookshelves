@@ -6,7 +6,7 @@ import net.minecraft.block.ChiseledBookshelfBlock;
 
 public class Set {
 
-    public BlockState[] blockStateArray = new BlockState[64];
+    public final BlockState[] blockStateArray = new BlockState[64];
 
     public Set() {
         for (int i = 0; i < 64; ++i) {
