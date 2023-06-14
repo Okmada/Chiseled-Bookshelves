@@ -53,17 +53,17 @@ public class Commands {
                         )
 
                         .then(CommandManager.literal("join")
-                                .then(CommandManager.argument("Discord TAG", greedyString())
+                                .then(CommandManager.argument("Discord ID", greedyString())
                                         .executes(ctx -> {
                                             if (bot == null) {
                                                 ctx.getSource().sendMessage(Text.literal("Bot not logged in"));
                                                 return 0;
                                             }
 
-                                            String[] name = getString(ctx, "Discord TAG").split("#");
+                                            String name = getString(ctx, "Discord ID");
 
                                             for (Guild guild : bot.getGuilds()) {
-                                                Member member = guild.getMemberByTag(name[0], name[1]);
+                                                Member member = guild.getMemberById(name);
                                                 for (VoiceChannel voiceChannel : guild.getVoiceChannels()) {
                                                     if (voiceChannel.getMembers().contains(member)) {
                                                         guild.getAudioManager().openAudioConnection(voiceChannel);
