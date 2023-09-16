@@ -104,15 +104,8 @@ public class VideoStream extends Thread {
     }
 
     public void exit() {
-        clearBuffers();
-
         paused.set(false);
         running.set(false);
-        try {
-            frameGrabber.release();
-        } catch (FFmpegFrameGrabber.Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void run() {
@@ -175,6 +168,12 @@ public class VideoStream extends Thread {
                 delta--;
             }
         }
+        try {
+            frameGrabber.release();
+        } catch (FFmpegFrameGrabber.Exception e) {
+            throw new RuntimeException(e);
+        }
+        clearBuffers();
     }
 
     public int getWidth() {
