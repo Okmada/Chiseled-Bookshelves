@@ -37,6 +37,8 @@ public class VideoStream extends Thread {
     private final Queue<Short> shortQueue = new LinkedList<>();
     private final Queue<BufferedImage> imageQueue = new LinkedList<>();
 
+    private int QUEUE_SIZE = 3;
+
 
     public VideoStream(String video, int round_to_h, int round_to_w, double scale, AudioPlayerSendHandler handler) {
         this.frameGrabber = new FFmpegFrameGrabber(video);
@@ -86,10 +88,19 @@ public class VideoStream extends Thread {
     }
 
     public void pause() {
-        clearBuffers();
-
         lastTime = System.nanoTime();
         paused.set(!paused.get());
+
+        if (paused.get()) {
+            clearBuffers();
+
+            try {
+                long currentTimestamp = frameGrabber.getTimestamp();
+                frameGrabber.setTimestamp(Math.max(0, currentTimestamp - QUEUE_SIZE));
+            } catch (FFmpegFrameGrabber.Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void exit() {
@@ -97,6 +108,11 @@ public class VideoStream extends Thread {
 
         paused.set(false);
         running.set(false);
+        try {
+            frameGrabber.release();
+        } catch (FFmpegFrameGrabber.Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void run() {
@@ -112,7 +128,7 @@ public class VideoStream extends Thread {
 
             while (paused.get()) {}
 
-            while (imageQueue.size() < 1) {
+            while (imageQueue.size() < QUEUE_SIZE) {
                 try {
                     Frame frame = frameGrabber.grab();
                     if (frame == null) {
@@ -142,7 +158,7 @@ public class VideoStream extends Thread {
                 }
             }
 
-            while (delta >= 1) {
+            if (delta >= 1) {
                 BufferedImage image = imageQueue.remove();
                 for(int x = 0; x < this.width; ++x) {
                     for(int y = 0; y < this.height; ++y) {

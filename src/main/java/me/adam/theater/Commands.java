@@ -199,7 +199,7 @@ public class Commands {
                                     double y = Double.parseDouble(getString(ctx, "yPos"));
                                     double z = Double.parseDouble(getString(ctx, "zPos"));
 
-                                    BlockPos bp = new BlockPos(x, y, z);
+                                    BlockPos bp = new BlockPos((int)x, (int)y, (int)z);
 
                                     Display display = new Display(ctx.getSource().getWorld(), bp, set, rgb);
 
